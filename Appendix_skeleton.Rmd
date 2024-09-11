@@ -1,0 +1,380 @@
+---
+title:  "Appendix B"
+subtitle: "Complete R Code & Annotated Output"
+date:   "Compiled: `r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  pdf_document:
+    toc: FALSE
+    latex_engine: xelatex 
+geometry: "left=1.5in,right=1in,top=1in,bottom=1in"
+bibliography: packages.bib 
+csl: apa7.csl
+nocite: '@*'
+header-includes:
+   - \usepackage{floatrow}
+   - \usepackage{booktabs}
+   - \usepackage{siunitx}
+   - \usepackage{caption}
+   - \usepackage{longtable}
+   - \usepackage{colortbl}
+   - \usepackage{array}
+   - \usepackage{caption}
+   - \usepackage{setspace}
+   - \usepackage{fancyhdr}
+---
+
+<!-- Define Page Numbering (Upper Right Corner) -->
+\pagenumbering{arabic}
+\setcounter{page}{100}
+\fancypagestyle{plain}{%
+  \renewcommand{\headrulewidth}{0pt}%
+<!--   \fancyhf{}% -->
+  \fancyhead[R]{\thepage}
+}
+\pagestyle{plain}
+
+
+
+<!--- Define Captions for Tables and Figures --->
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\captionsetup{labelfont=bf, 
+              textfont={it}, 
+              labelsep=newline,
+              justification=raggedright, 
+              singlelinecheck=false}
+\floatsetup[figure]{capposition=top}
+\floatsetup[table]{capposition=top}
+\renewcommand{\thefigure}{B.\arabic{figure}}
+\renewcommand{\thetable}{B.\arabic{table}}
+
+
+
+\clearpage
+
+<!-- FRONT MATTER -->
+
+<!-- Table of Contents -->
+\tableofcontents    
+
+\clearpage
+
+<!-- List of Tables -->
+\listoftables
+
+\clearpage
+
+<!-- List if Figures -->
+\listoffigures
+
+\clearpage
+
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(comment     = "",
+                      echo        = TRUE,
+                      warning     = FALSE, 
+                      message     = FALSE,
+                      ft.align    ="left",
+                      fig.pos     = "hb",     
+                      fig.align   = "left",   
+                      fig.width   = 5,     
+                      fig.height  = 3)  
+```
+
+
+# BACKGROUND
+
+* Be brief
+* Use lists and bullets
+* Do not need to include the entire manuscript
+
+## Research Questions
+
+Why?
+
+## Sample
+
+Who/when/where?
+
+
+## Measures
+
+What?
+
+
+## Analysis
+
+How?
+
+
+
+\clearpage
+
+# PREPARATION
+
+## Load Packages
+
+> From GitHub: this only needs to be done ONCE per computer installation
+
+```{r, eval=FALSE}
+library(devtools)
+devtools::install_github("SarBearSchwartz/apaSupp")
+```
+
+> From CRAN
+
+* This is a general list you might start with
+* Make sure to edit this code chunk to delete packages you didn't end up using before finalizing
+* ONLY put `library()` function calls here, do NOT add them in the lower part of the document!
+
+```{r, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+library(apaSupp)
+library(tidyverse)
+library(readxl)
+library(haven)
+library(furniture)
+library(psych)
+library(rempsyc)
+library(flextable)
+library(naniar)
+library(rstatix)
+library(ggpubr)
+library(MOTE)
+library(flextable)
+library(texreg)
+library(texreghelpr)
+library(afex)
+library(emmeans)
+library(interactions)
+library(performance)
+```
+
+
+
+
+
+## Default Settings 
+
+
+```{r}
+options(dplyr.summarise.inform = FALSE)
+
+flextable::set_flextable_defaults(theme_fun = "theme_apa",
+                                  font.size = 10,
+                                  layout = "autofit")
+
+ggplot2::theme_set(theme_bw())
+```
+
+
+
+\clearpage
+
+## Load Data
+
+> You can load Multiple files
+
+* I suggest doing as much data cleaning in a separate "prep" file first
+* Are these files publicly available (Open Science Framework)?
+
+* Avoid printing the entire dataset
+* Instead use
+    + `tibble::glimpse()`
+    + `head` or `psych::headTail()` with `apaSupp::apaTab()`
+
+
+```{r}
+df_raw <- read.csv("https://stats.idre.ucla.edu/wp-content/uploads/2019/03/exercise.csv")
+```
+
+
+
+```{r}
+tibble::glimpse(df_raw)
+```
+
+
+
+
+
+
+\clearpage
+
+
+# DATA WRANGLING
+
+> If this is a large task, I suggest seperating it into a seperate Rmd file and save the polished data file that is ready to go. 
+
+Possible tasks may include...
+
+* Factors
+    + Declare so they aren't treated as continuous values
+    + Apply value labels (text for output, tables, figures)
+    + Arrange "reference" category to be first in order
+* Deal with missing values
+    + This is more often an SPSS issue
+* Score any measures
+    + Do any of the items need to be reverse coded
+    + Aggregate "Sum" or "Mean" for subscores/domains or total/global
+* Pivot Formats
+    + Wide: one line per person
+    + Long: one line per observation
+    + Can have other formats
+
+
+```{r}
+df_use <- df_raw %>% 
+  dplyr::mutate(id = factor(id)) %>% 
+  dplyr::mutate(gender = factor(gender) %>% 
+                  forcats::fct_recode("Male"   = "1",
+                                      "Female" = "2")) %>% 
+  dplyr::mutate(prog = factor(prog) %>% 
+                  forcats::fct_recode("Jog"  = "1",
+                                      "Swim" = "2",
+                                      "Read" = "3"))
+```
+
+```{r}
+tibble::glimpse(df_use)
+```
+
+
+\clearpage
+
+```{r}
+df_use %>% 
+  psych::headTail(top = 6) %>% 
+  flextable::flextable() %>% 
+  flextable::set_caption("Dataset View")
+```
+
+\clearpage
+
+# EXPLORATORY DATA ANLAYSIS
+
+## Sample Size
+
+* Inclusion & Exclusion Criteria?
+* Levels of sampling?
+
+
+```{r}
+nrow(df_use)
+```
+
+
+
+\clearpage
+
+## Missing Data
+
+* Which variables?
+* How much?
+* Patterns of missingness
+
+Useful package: `naniar`
+
+
+```{r, fig.cap="Amount of Missing Data by Variable"}
+df_use %>% 
+  naniar::gg_miss_var() 
+```
+
+
+
+
+\clearpage
+
+
+## Descriptive Summary
+
+* min-max
+* Means
+* standard deviations
+* Correlations
+
+Common tools
+
+* `summary()` - very basic, try to avoid
+* `psych::describle()` - only for continuous variables
+* `furniture::table1()` - basic descriptions, may compare groups
+* `furniture::tableC()`
+* `flextable::flextable()` with `apaSupp::theme_apa()` - generic for making any data frame into a table
+
+
+
+```{r}
+df_use %>% 
+  furniture::table1("Gender" = gender,
+                    "Weight Loss, pounds" = loss,
+                    "Program Use, hours" = hours,
+                    "Program Effort, rating" = effort,
+                    splitby =  ~ prog,
+                    total = TRUE,
+                    test = TRUE,
+                    na.rm = FALSE,
+                    output = "markdown",
+                    digits = 2,
+                    caption = "Descriptive Summary by Program")
+```
+
+
+
+
+\clearpage
+
+## Varaible Distibutions
+
+* 1 Categorical: `geom_bar()` or `geom_col()`
+* 1 Continuous:  `geom_histogram()`
+* 2 categorical: `geom_point()` or `geom_count()`
+
+
+
+
+
+
+\clearpage
+
+# ANALYSIS
+
+Create sections dependent on project
+
+
+
+
+
+\clearpage
+
+# SESSION INFORMATION
+
+```{r}
+sessionInfo()
+```
+
+
+\clearpage
+
+# BIBLIOGRAPHY
+
+
+
+
+```{r, echo=FALSE, results='hide'}
+# Include the R programing language
+toBibtex(citation())  
+
+# Include specific packages
+# toBibtex(citation("geepack"))
+
+# write all citations to .bib file
+knitr::write_bib(c(.packages()), "packages.bib") 
+```
+
+
+\doublespacing
+
+
+
+

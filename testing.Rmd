@@ -1,0 +1,205 @@
+---
+title:  "Appendix B"
+author: "Supplemental Material: Quantitative Anlaysis"
+date:   "`r format(Sys.time(), '%B %d %Y')`"
+output: 
+  pdf_document:
+    toc: TRUE
+    toc_depth: 2
+    latex_engine: xelatex
+bibliography: packages.bib
+csl: apa7.csl
+nocite: '@*'
+header-includes:
+   - \usepackage{floatrow}
+   - \usepackage{booktabs}
+   - \usepackage{siunitx}
+   - \usepackage{caption}
+   - \usepackage{longtable}
+   - \usepackage{colortbl}
+   - \usepackage{array}
+   - \usepackage{caption}
+   - \usepackage{setspace}
+   - \captionsetup{labelfont=bf, 
+                   textfont={it}, 
+                   labelsep=newline,
+                   justification=raggedright, 
+                   singlelinecheck=false}
+   - \floatsetup[figure]{capposition=top}
+   - \floatsetup[table]{capposition=top}
+   - \renewcommand{\thefigure}{B.\arabic{figure}}
+   - \renewcommand{\thetable}{B.\arabic{table}}
+   - \setcounter{figure}{0}
+   - \setcounter{table}{0}
+   - \setcounter{page}{100}
+---
+
+\clearpage
+\listoftables
+\listoffigures
+\clearpage
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(comment     = "",
+                      echo        = TRUE,
+                      warning     = FALSE, 
+                      message     = FALSE,
+                      ft.align    ="left",
+                      fig.pos     = "hb",     
+                      fig.align   = "left",   
+                      fig.width   = 5,     
+                      fig.height  = 3)  
+```
+
+
+
+
+# PREPARATION
+
+## Load Package
+
+```{r, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+library(tidyverse)
+library(pander)
+library(apaSupp)
+library(flextable)
+```
+
+
+```{r, echo=FALSE, results='hide'}
+toBibtex(citation())
+
+# toBibtex(citation("geepack"))
+```
+
+```{r, echo=FALSE, results='hide'}
+knitr::write_bib(c(.packages()), "packages.bib")
+```
+
+
+## Set Options
+
+```{r}
+options(dplyr.summarise.inform = FALSE)
+
+panderOptions('digits', 3)
+panderOptions('round', 3)
+panderOptions('keep.trailing.zeros', TRUE)
+```
+
+
+\clearpage
+
+## Load Data
+
+```{r}
+df <- head(cars)
+```
+
+
+
+```{r}
+df %>% 
+  apaSupp::apaTab(caption = "First Rows of the Cars Dataset",
+                  general_note = "First 6 automobiles displayed.") 
+```
+
+\clearpage
+
+
+
+```{r}
+data("States", package = "carData")
+```
+
+
+
+```{r}
+States %>% 
+  tibble::rownames_to_column(var = "State") %>% 
+  head() %>% 
+  apaSupp::apaTab(caption = "First Rows of the States Dataset",
+                  general_note = "Only the first six states shown",
+                  p_note = NULL) %>%
+  flextable::align(j = 1,
+                   align = "left") %>% 
+  flextable::width(j = 2, width = 1)
+```
+
+\clearpage
+
+# EXPLORATORY DATA ANALYSIS
+
+## Summary Statistucs
+
+
+```{r}
+States %>% 
+  furniture::table1("Teacher Salary, in 1000s" = pay,
+                    "Population, in 1000s" = pop,
+                    "Scholastic Aptitude Test, Verbal" = SATV,
+                    output = "markdown",
+                    caption = "Descriptive Summary of the States")
+```
+
+\clearpage
+
+## Visualizations
+
+```{r, fig.cap = "Association between State Population and Teacher Pay"}
+States %>% 
+  ggplot(aes(x = pop,
+             y = pay)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Population, in 1000s",
+       y = "Scholastic Aptitude Test, Verbal")
+```
+
+
+\clearpage
+
+# ANALYSIS
+
+## Multiple Linear Regression
+
+```{r}
+fit_lm <- lm(pay ~ pop + SATV,
+             data = States)
+  
+```
+
+```{r, results='asis'}
+texreg::knitreg(fit_lm,
+                custom.model.names = c("Teacher Salary"),
+                custom.coef.map = list("(Intercept)" = "Intercept",
+                                       "pop" = "Population, 1000's",
+                                       "SATV" = "Verbal"),
+                single.row = TRUE,
+                caption.above = TRUE,
+                booktabs = TRUE,
+                float.pos = "hb",
+                center = FALSE,
+                caption = "Parameter Estimates for Mean Teacher Pay Regression on Population and Verbal Scholastic Aptitude Test",
+                custom.note = "Note. Teacher Salary = 1000's dollars, Verbal = state mean Verbal Scholastic Aptitude Test")
+```
+
+
+\clearpage
+
+# SESSION INFORMATION
+
+```{r}
+sessionInfo()
+```
+
+
+
+\clearpage
+
+# BIBLIOGRAPHY
+
+\doublespacing
+
+
+

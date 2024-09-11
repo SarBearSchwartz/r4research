@@ -1,0 +1,269 @@
+---
+title:  "Appendix B"
+author: "Supplemental Material: Quantitative Anlaysis"
+date:   "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  pdf_document:
+    toc: TRUE
+    toc_depth: 2
+    latex_engine: xelatex
+bibliography: packages.bib 
+csl: apa7.csl
+nocite: '@*'
+header-includes:
+   - \usepackage{floatrow}
+   - \usepackage{booktabs}
+   - \usepackage{siunitx}
+   - \usepackage{caption}
+   - \usepackage{longtable}
+   - \usepackage{colortbl}
+   - \usepackage{array}
+   - \usepackage{caption}
+   - \usepackage{setspace}
+   - \captionsetup{labelfont=bf, 
+                   textfont={it}, 
+                   labelsep=newline,
+                   justification=raggedright, 
+                   singlelinecheck=false}
+   - \floatsetup[figure]{capposition=top}
+   - \floatsetup[table]{capposition=top}
+   - \renewcommand{\thefigure}{B.\arabic{figure}}
+   - \renewcommand{\thetable}{B.\arabic{table}}
+   - \setcounter{figure}{0}
+   - \setcounter{table}{0}
+   - \setcounter{page}{100}
+---
+
+\clearpage
+\listoftables
+\listoffigures
+\clearpage
+
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(comment     = "",
+                      echo        = TRUE,
+                      warning     = FALSE, 
+                      message     = FALSE,
+                      ft.align    ="left",
+                      fig.pos     = "hb",     
+                      fig.align   = "left",   
+                      fig.width   = 5,     
+                      fig.height  = 3)  
+```
+
+
+# BACKGROUND
+
+* Be brief
+* Use lists and bullets
+* Do not need to include the entire manuscript
+
+## Research Questions
+
+Why?
+
+## Sample
+
+Who/when/where?
+
+
+## Measures
+
+What?
+
+
+## Analysis
+
+How?
+
+
+
+\clearpage
+
+# PREPARATION
+
+## Load Packages
+
+> From GitHub: this only needs to be done ONCE per computer installation
+
+```{r, eval=FALSE}
+library(devtools)
+devtools::install_github("SarBearSchwartz/apaSupp")
+```
+
+> From CRAN
+
+* This is a general list you might start with
+* Make sure to edit this code chunk to delete packages you didn't end up using before finalizing
+* ONLY put `library()` function calls here, do NOT add them in the lower part of the document!
+
+```{r, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+library(apaSupp)
+library(tidyverse)
+library(readxl)
+library(haven)
+library(furniture)
+library(rstatix)
+library(ggpubr)
+library(MOTE)
+library(flextable)
+library(texreg)
+library(texreghelpr)
+library(afex)
+library(emmeans)
+library(interactions)
+library(performance)
+```
+
+
+
+
+```{r, echo=FALSE, results='hide'}
+# Include the R programing language
+toBibtex(citation())  
+
+# Include specific packages
+# toBibtex(citation("geepack"))
+
+# write all citations to .bib file
+knitr::write_bib(c(.packages()), "packages.bib") 
+```
+
+
+
+
+> Global Settings 
+
+
+```{r}
+options(dplyr.summarise.inform = FALSE)
+```
+
+
+
+
+
+
+
+\clearpage
+
+## Load Data
+
+> You can load Multiple files
+
+* I suggest doing as much data cleaning in a separate "prep" file first
+* Are these files publicly available (Open Science Framework)?
+
+* Avoid printing the entire dataset
+* Instead use
+    + `tibble::glimpse()`
+    + `head` or `psych::headTail()` with `apaSupp::apaTab()`
+
+\clearpage
+
+
+# DATA WRANGLING
+
+> If this is a large task, I suggest seperating it into a seperate Rmd file and save the polished data file that is ready to go. 
+
+Possible tasks may include...
+
+* Factors
+    + Declare so they aren't treated as continuous values
+    + Apply value labels (text for output, tables, figures)
+    + Arrange "reference" category to be first in order
+* Deal with missing values
+    + This is more often an SPSS issue
+* Score any measures
+    + Do any of the items need to be reverse coded
+    + Aggregate "Sum" or "Mean" for subscores/domains or total/global
+* Pivot Formats
+    + Wide: one line per person
+    + Long: one line per observation
+    + Can have other formats
+
+
+
+
+\clearpage
+
+# EXPLORATORY DATA ANLAYSIS
+
+## Sample Size
+
+* Inclusion & Exclusion Criteria?
+* Levels of sampling?
+
+
+\clearpage
+
+## Missing Data
+
+* Which variables?
+* How much?
+* Patterns of missingness
+
+Useful package: `naniar`
+
+
+\clearpage
+
+## Descriptive Summary
+
+* min-max
+* Means
+* standard deviations
+* Correlations
+
+Common tools
+
+* `summary()` - very basic, try to avoid
+* `psych::describle()` - only for continuous variables
+* `furniture::table1()` - basic descriptions, may compare groups
+* `furniture::tableC()`
+* `apaSupp::apaTab()` - generic for making any data frame into a table
+
+
+
+\clearpage
+
+## Varaible Distibutions
+
+* 1 Categorical: `geom_bar()` or `geom_col()`
+* 1 Continuous: `geom_histogram()`
+* 2 categorical: `geom_point()` or `geom_count()`
+
+
+
+
+
+
+\clearpage
+
+# ANALYSIS
+
+Create sections dependent on project
+
+
+
+
+
+\clearpage
+
+# SESSION INFORMATION
+
+```{r}
+sessionInfo()
+```
+
+
+\clearpage
+
+# BIBLIOGRAPHY
+
+\doublespacing
+
+
+
+
